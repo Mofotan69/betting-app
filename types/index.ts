@@ -1,10 +1,15 @@
-export type Game = {
-  id: string;
-  teamA: string;
-  teamB: string;
-  startTime: string;
-  status: "open" | "closed" | "settled";
-  result?: string;
+type Game = {
+  id: number;
+  date: string;
+  status: string;
+  home_team_score: number;
+  visitor_team_score: number;
+  home_team: { abbreviation: string };
+  visitor_team: { abbreviation: string };
+};
+
+type APIResponse = {
+  data: Game[];
 };
 
 export type Bet = {

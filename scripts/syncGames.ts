@@ -2,6 +2,20 @@ import fetch from "node-fetch";
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 
+type Game = {
+  id: number;
+  date: string;
+  status: string;
+  home_team_score: number;
+  visitor_team_score: number;
+  home_team: { abbreviation: string };
+  visitor_team: { abbreviation: string };
+};
+
+type APIResponse = {
+  data: Game[];
+};
+
 // =========================
 // FIREBASE CONFIG
 // =========================
@@ -50,7 +64,7 @@ async function syncNBA() {
     }
     );
 
-    const data = await res.json();
+    const data = (await res.json()) as APIResponse;
 
     // 🔍 Defensive check
     if (!data || !Array.isArray(data.data)) {

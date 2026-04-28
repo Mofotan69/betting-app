@@ -52,7 +52,7 @@ export const syncGames = onSchedule("every 1 minutes", async () => {
     `https://api.balldontlie.io/v1/games?start_date=${startDate}&end_date=${endDate}`,
     {
       headers: {
-        Authorization: "YOUR_API_KEY"
+        Authorization: "060d2a7e-0720-4cfa-b47b-ed4f9ebc84b8"
       }
     }
   );

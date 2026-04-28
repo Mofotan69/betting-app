@@ -21,5 +21,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Build TypeScript
+        run: npx tsc
+
       - name: Run sync script
-        run: node scripts/syncGames.ts
+        run: node dist/syncGames.js
