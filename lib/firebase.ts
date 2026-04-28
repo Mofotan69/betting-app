@@ -3,9 +3,9 @@ import { getFirestore } from "firebase/firestore";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBI0TZHDNZfMM2QVUOwkYhlmhMcxQ6PuV8",
-  authDomain: "nba-playoffs-550b5.firebaseapp.com",
-  projectId: "nba-playoffs-550b5",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
   storageBucket: "nba-playoffs-550b5.firebasestorage.app",
   messagingSenderId: "790208566525",
   appId: "1:790208566525:web:957d573fc5cd73bb39da94",
