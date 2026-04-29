@@ -4,6 +4,7 @@ import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 type Game = {
   id: number;
+  userId: string;
   date: string;
   status: string;
   home_team_score: number;

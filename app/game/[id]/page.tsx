@@ -16,6 +16,17 @@ import {
 } from "firebase/firestore"; //basic database functions
 import { onAuthStateChanged } from "firebase/auth"; //detects if user is logged in
 
+type Bet = {
+  id: string;
+  userId: string;
+  user: string;
+  gameId: string;
+  team: string;
+  amount: number;
+  payout?: number;
+  status?: string;
+};
+
 export default function GamePage() {
   const { id } = useParams(); //retrieves game ID from URL "/game/123", "123" is retrieved
   const router = useRouter(); //redirects to login
@@ -24,13 +35,13 @@ export default function GamePage() {
   // STATE
   // =========================
   const [user, setUser] = useState<any>(null); //updates user info
-  const [bets, setBets] = useState<any[]>([]); //stores previous bets
+  const [bets, setBets] = useState<Bet[]>([]); //stores previous bets
   const [game, setGame] = useState<any>(null); //stores games
 
   const [amount, setAmount] = useState(0); //stores amount user bets
   const [team, setTeam] = useState(""); //stores which team the bet was placed on
 
-  const [myBet, setMyBet] = useState<any>(null); //stores current user bet
+  const [myBet, setMyBet] = useState<Bet | null>(null); //stores current user bet
 
   // =========================
   // AUTH
@@ -84,7 +95,7 @@ export default function GamePage() {
       const allBets = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data()
-      }));
+      })) as Bet[];
 
       setBets(allBets); //same logic as Fetch Games
 
@@ -149,7 +160,7 @@ export default function GamePage() {
       // CREATE (if user hasn't made a bet, only one allowed)
       await addDoc(collection(db, "bets"), {
         userId: user.uid,
-        user: user.displayName,
+        user: user.displayName || "Anonymous",
         gameId: id,
         team,
         amount
@@ -189,17 +200,20 @@ export default function GamePage() {
     const totalWinning = winningBets.reduce((sum, b) => sum + b.amount, 0);
 
     for (const bet of bets) {
-      let payout = 0;
+      await Promise.all(
+        bets.map((bet) => {
+          let payout = 0;
 
-      if (bet.team === winner) {
-        payout = (bet.amount / totalWinning) * totalPot;
-      }
+          if (bet.team === winner) {
+            payout = (bet.amount / totalWinning) * totalPot;
+          }
 
-      await updateDoc(doc(db, "bets", bet.id), {
-        payout,
-        status: "settled"
-      });
-    }
+          return updateDoc(doc(db, "bets", bet.id), {
+            payout,
+            status: "settled"
+        });
+        })
+      );
 
     // Mark game as settled
     await updateDoc(doc(db, "games", id as string), {
@@ -304,4 +318,4 @@ export default function GamePage() {
       ))}
     </div>
   );
-}
+  }}
