@@ -191,7 +191,6 @@ export default function GamePage() {
   const settleGame = async (winner: string) => {
     if (!bets.length || !game) return;
 
-    // Prevent running multiple times
     if (game.status === "settled") return;
 
     const totalPot = bets.reduce((sum, b) => sum + b.amount, 0);
@@ -199,23 +198,21 @@ export default function GamePage() {
     const winningBets = bets.filter((b) => b.team === winner);
     const totalWinning = winningBets.reduce((sum, b) => sum + b.amount, 0);
 
-    for (const bet of bets) {
-      await Promise.all(
-        bets.map((bet) => {
-          let payout = 0;
+    await Promise.all(
+      bets.map((bet) => {
+        let payout = 0;
 
-          if (bet.team === winner) {
-            payout = (bet.amount / totalWinning) * totalPot;
-          }
+        if (bet.team === winner && totalWinning > 0) {
+          payout = (bet.amount / totalWinning) * totalPot;
+        }
 
-          return updateDoc(doc(db, "bets", bet.id), {
-            payout,
-            status: "settled"
+        return updateDoc(doc(db, "bets", bet.id), {
+          payout,
+          status: "settled"
         });
-        })
-      );
+      })
+    );
 
-    // Mark game as settled
     await updateDoc(doc(db, "games", id as string), {
       status: "settled"
     });
@@ -245,7 +242,12 @@ export default function GamePage() {
             <p><strong>Winner:</strong> {game.winner}</p>
           )}
 
-          <p>Start Time: {new Date(game.startTime).toLocaleString()}</p>
+          <p>
+            Start Time:{" "}
+            {game?.startTime
+              ? new Date(game.startTime).toLocaleString()
+              : "TBD"}
+          </p>
         </>
       )}
 
@@ -318,4 +320,4 @@ export default function GamePage() {
       ))}
     </div>
   );
-  }}
+  }
