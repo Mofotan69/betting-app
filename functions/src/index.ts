@@ -1,4 +1,4 @@
-import { onSchedule } from "firebase-functions/v2/scheduler";
+import { scheduler } from "firebase-functions/v2";
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
@@ -35,7 +35,7 @@ type APIResponse = {
 // =========================
 // SCHEDULED FUNCTION (v2)
 // =========================
-export const syncGames = onSchedule("every 1 minutes", async () => {
+export const syncGames = scheduler.onSchedule("every 1 minutes", async () => {
   console.log("Running NBA sync...");
 
   const today = new Date();
