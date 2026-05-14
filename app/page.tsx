@@ -1,6 +1,6 @@
 "use client";
 
-import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
+import { collection, onSnapshot, query, orderBy, Timestamp } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -31,11 +31,12 @@ export default function Home() {
   // =========================
   // FETCH GAMES (REALTIME)
   // =========================
+  
   useEffect(() => {
     const q = query(collection(db, "games"), orderBy("startTime", "desc"));
 
     const unsub = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map((doc) => ({
+      const data = snapshot.docs.map((doc) => ({ // Reading from Firestore, not API
         id: doc.id,
         ...doc.data()
       }));
@@ -97,7 +98,9 @@ export default function Home() {
         </div>
 
         <div style={{ fontSize: 14 }}>
-          Start: {new Date(game.startTime).toLocaleString()}
+          Start: {new Date(game.startTime).toLocaleString("en-SG", {
+                    timeZone: "Asia/Singapore"
+                  })}
         </div>
 
         {game.status !== "upcoming" && (
@@ -148,3 +151,4 @@ export default function Home() {
     </div>
   );
 }
+

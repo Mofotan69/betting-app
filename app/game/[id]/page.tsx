@@ -138,8 +138,15 @@ export default function GamePage() {
   // LOCK LOGIC
   // =========================
   const isBettingOpen = () => {
-    if (!game?.startTime) return false;
-    return new Date() < new Date(game.startTime);
+    if (!game) return false;
+
+    const lockedStatuses = [
+      "live",
+      "finished",
+      "settled"
+    ];
+
+    return !lockedStatuses.includes(game.status);
   };
 
   // =========================

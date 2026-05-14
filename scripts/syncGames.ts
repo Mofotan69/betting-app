@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { getFirestore, doc, setDoc, Timestamp } from "firebase/firestore";
 
 type Game = {
   id: number;
@@ -96,7 +96,7 @@ async function syncNBA() {
         externalId: g.id,
         teamA: g.home_team.abbreviation,
         teamB: g.visitor_team.abbreviation,
-        startTime: g.date,
+        startTime: Timestamp.fromDate(new Date(g.date)),
         status,
         scoreA: homeScore,
         scoreB: awayScore,
