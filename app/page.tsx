@@ -32,20 +32,32 @@ export default function Home() {
   // FETCH GAMES (REALTIME)
   // =========================
   
-  useEffect(() => {
-    const q = query(collection(db, "games"), orderBy("startTime", "desc"));
+useEffect(() => {
+  const q = query(
+    collection(db, "games"),
+    orderBy("startTime", "asc") // upcoming games first
+  );
 
-    const unsub = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map((doc) => ({ // Reading from Firestore, not API
+  const unsub = onSnapshot(q, (snapshot) => {
+    const data = snapshot.docs
+      .map((doc) => ({
         id: doc.id,
-        ...doc.data()
-      }));
+        ...doc.data(),
+      }))
 
-      setGames(data);
-    });
+      // Remove fake playoff games
+      .filter((g: any) => !g.isCancelled)
 
-    return () => unsub();
-  }, []);
+      // Optional: only show relevant games
+      .filter((g: any) =>
+        ["upcoming", "live", "finished"].includes(g.status)
+      );
+
+    setGames(data);
+  });
+
+  return () => unsub();
+}, []);
 
   // =========================
   // FILTER GAMES (LAST 7 DAYS + FUTURE)
@@ -58,9 +70,17 @@ export default function Home() {
   const filteredGames = games.filter((g) => {
     if (!g.startTime) return false;
 
-    const gameDate = new Date(g.startTime);
+    let gameDate: Date;
 
-    // keep only games within last 7 days or future
+    // Firestore Timestamp
+    if (g.startTime?.toDate) {
+      gameDate = g.startTime.toDate();
+    }
+    // String date fallback
+    else {
+      gameDate = new Date(g.startTime);
+    }
+
     return gameDate >= pastLimit;
   });
 
@@ -98,9 +118,15 @@ export default function Home() {
         </div>
 
         <div style={{ fontSize: 14 }}>
-          Start: {new Date(game.startTime).toLocaleString("en-SG", {
-                    timeZone: "Asia/Singapore"
-                  })}
+          Start: {
+          (
+            game.startTime?.toDate
+              ? game.startTime.toDate()
+              : new Date(game.startTime)
+          ).toLocaleString("en-SG", {
+            timeZone: "Asia/Singapore",
+          })
+        }
         </div>
 
         {game.status !== "upcoming" && (
